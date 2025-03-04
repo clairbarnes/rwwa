@@ -157,8 +157,8 @@ synthesis <- function(obs_in = NA, models_in, synth_type = "abs") {
 
   # unweighted mean of obs and models
   umean <- (obs["est"] +  models["est"]) / 2
-  synth["l_wb"] <- umean - sqrt((obs["est"]-obs["lower"])^2 + (models["est"]-models["lower"])^2)/2
-  synth["u_wb"] <- umean + sqrt((obs["est"]-obs["upper"])^2 + (models["est"]-models["upper"])^2)/2
+  synth["l_wb"] <- umean - sqrt(((obs["est"]-obs["lower"])^2 + (models["est"]-models["lower"])^2)/2)
+  synth["u_wb"] <- umean + sqrt(((obs["est"]-obs["upper"])^2 + (models["est"]-models["upper"])^2)/2)
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # add group labels for easier plotting
@@ -193,7 +193,7 @@ synthesis <- function(obs_in = NA, models_in, synth_type = "abs") {
     umean <- 100*(exp(umean)-1)
   }
 
-  return(list(synth_type = synth_type, sig_obs = sig_obs, "chi2/dof" = chi2 / mdof, df = res, uw_mean = umean))
+  return(list(synth_type = synth_type, sig_obs = sig_obs, "chi2/dof" = chi2 / mdof, sig_mod = sig_mod, df = res, uw_mean = umean))
 }
 
 

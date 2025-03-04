@@ -81,14 +81,14 @@ fit_ns <- function(dist, type = "fixeddisp", data, varnm, covnm = NA, lower = F,
   # if looking at lower tail with a GEV, necessary to negate data and consider block maxima - add flag to keep track
   minima <- F
   if (lower & (dist %in% c("gev"))) {
-      x <- -x
-      minima <- T
+    x <- -x
+    minima <- T
   }
 
   # fit model with appropriate number of parameters, pad if necessary
   init <- c("mu0" = mean(x), "sigma0" = sd(x), setNames(rep(0,k), paste0("alpha_", covnm)))
 
-  if(type %in% c("shiftscale")) init <- c(init, setNames(rep(1,k), paste0("beta_", covnm)))
+  if(type %in% c("shiftscale", "shiftscale_linear", "shiftscale_exp")) init <- c(init, setNames(rep(0,k), paste0("beta_", covnm)))
 
   if(dist %in% c("gev")) init <- c(init, "shape" = 0)
   fitted <- suppressWarnings(optim(par = init, ns_loglik, cov = cov, x = x, dist = dist, fittype = type, method = method))
@@ -116,18 +116,24 @@ fit_ns <- function(dist, type = "fixeddisp", data, varnm, covnm = NA, lower = F,
   # event year: assume that event of interest is most recent, unless told otherwise (used in later plotting functions)
   if(is.na(ev_year)) { ev_year <- data$year[length(x)] }
   fitted[["ev_year"]] <- ev_year
-  fitted[["ev_idx"]] <- which(data$year == ev_year)
+
+  if (ev_year %in% data$year) {
+    ev_idx <- which(data$year == ev_year)
+  } else {
+    ev_idx <- nrow(data)+1
+  }
 
   # event value: assume that event of interest is most recent, unless told otherwise (used in later plotting functions)
   if(is.na(ev)) {
     if(ev_year %in% data$year) {
-        ev <- data[data$year == ev_year,varnm]
-      } else {
-        print("WARNING: Event year not in data, no event value recorded")
-        ev <- -999
-      }
+      ev <- data[data$year == ev_year,varnm]
+    } else {
+      print("WARNING: Event year not in data, no event value recorded")
+      ev <- NA
     }
+  }
   fitted[["ev"]] <- ev
+  fitted[["ev_idx"]] <- ev_idx
 
   return(fitted)
 }
