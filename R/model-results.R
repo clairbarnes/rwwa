@@ -50,7 +50,7 @@ mdl_ests <- function(mdl, cov_f, cov_cf, ev, rp = NA) {
       }))
   }
 
-  return(c(mdl$par, "disp" = disp, "event_magnitude" = ev, "return_period" = rp, changes))
+  return(c(mdl$par, "disp" = disp, "event_magnitude" = ev, "return_period" = rp, changes, "aic" = aic(mdl)))
 }
 
 
