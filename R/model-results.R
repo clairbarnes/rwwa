@@ -38,16 +38,20 @@ mdl_ests <- function(mdl, cov_f, cov_cf, ev, rp = NA) {
 
   # loop over counterfactual covariates (if necessary) & get PRs and intensity changes
   if(nrow(cov_cf) == 1) {
-      changes <- c("PR" = prob_ratio(mdl, ev, cov_f, cov_cf),
-                   "dI_abs" = tryCatch(int_change(mdl, rp, cov_f, cov_cf, relative = F), error = function(cond) {return(NA)}),
-                   "dI_rel" = tryCatch(int_change(mdl, rp, cov_f, cov_cf, relative = T), error = function(cond) {return(NA)}))
+    changes <- c("PR" = prob_ratio(mdl, ev, cov_f, cov_cf),
+                 "dI_abs" = tryCatch(int_change(mdl, rp, cov_f, cov_cf, relative = F), error = function(cond) {return(NA)}),
+                 "dI_rel" = tryCatch(int_change(mdl, rp, cov_f, cov_cf, relative = T), error = function(cond) {return(NA)}))
   } else {
-      changes <- unlist(lapply(rownames(cov_cf), function(rnm) {
-          pr <- prob_ratio(mdl, ev, cov_f, cov_cf[rnm,,drop = F])
-          di_abs <- tryCatch(int_change(mdl, rp, cov_f, cov_cf[rnm,,drop = F], relative = F), error = function(cond) {return(NA)})
-          di_rel <- tryCatch(int_change(mdl, rp, cov_f, cov_cf[rnm,,drop = F], relative = T), error = function(cond) {return(NA)})
-          setNames(c(pr, di_abs, di_rel), paste0(c("PR", "dI_abs", "dI_rel"), "_",rnm))
-      }))
+    changes <- unlist(lapply(rownames(cov_cf), function(rnm) {
+      pr <- prob_ratio(mdl, ev, cov_f, cov_cf[rnm,,drop = F])
+      di_abs <- tryCatch(int_change(mdl, rp, cov_f, cov_cf[rnm,,drop = F], relative = F), error = function(cond) {return(NA)})
+      di_rel <- tryCatch(int_change(mdl, rp, cov_f, cov_cf[rnm,,drop = F], relative = T), error = function(cond) {return(NA)})
+      setNames(c(pr, di_abs, di_rel), paste0(c("PR", "dI_abs", "dI_rel"), "_",rnm))
+    }))
+  }
+  if(mdl$dist %in% c("lnorm")) {
+    ev <- exp(ev)
+    # could also reverse transformation on model parameters here, if preferred
   }
 
   return(c(mdl$par, "disp" = disp, "event_magnitude" = ev, "return_period" = rp, changes, "aic" = aic(mdl)))

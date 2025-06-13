@@ -27,7 +27,7 @@ ns_loglik <- function(pars, cov, x, dist, fittype) {
   if(any(scale <= 0)) return(NA)
 
   # return negative log-likelihood
-  if (dist == "norm") {
+  if (dist %in% c("norm", "lnorm")) {
     return(-sum(dnorm(x, mean = loc, sd = scale, log = T)))
   } else if (dist == "gev") {
     shape = pars["shape"]
@@ -74,8 +74,11 @@ fit_ns <- function(dist, type = "fixeddisp", data, varnm, covnm = NA, lower = F,
 
   # should also add something to handle case with no covariates
 
+  # log-transform data for lognormal fitting
+  if (dist %in% c("lnorm")) x <- log(x)
+
   # currently only works for distributions fully specified by mean & sd: only tested for normal, lognormal
-  if(! dist %in% c("norm", "gev", "gumbel")) {
+  if(! dist %in% c("norm", "gev", "gumbel", "lnorm")) {
     print("Not yet implemented: use norm or gev")
     return()
   }
@@ -128,7 +131,7 @@ fit_ns <- function(dist, type = "fixeddisp", data, varnm, covnm = NA, lower = F,
   # event value: assume that event of interest is most recent, unless told otherwise (used in later plotting functions)
   if(is.na(ev)) {
     if(ev_year %in% data$year) {
-      ev <- data[data$year == ev_year,varnm]
+      ev <- x[data$year == ev_year]
     } else {
       print("WARNING: Event year not in data, no event value recorded")
       ev <- NA
@@ -166,7 +169,11 @@ refit <- function(mdl, new_data) {
 #'
 #' @export
 #'
-aic <- function(mdl) 2 * length(mdl$par) + 2 * mdl$value
+aic <- function(mdl) {
+  nll <- 2 * length(mdl$par) + 2 * mdl$value
+  if(mdl$dist %in% c("lnorm")) nll <- nll + 2*sum(log(mdl$x))
+  return(nll)
+}
 
 
 ################################################################################################################################
