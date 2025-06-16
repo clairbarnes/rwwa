@@ -27,7 +27,7 @@ ns_loglik <- function(pars, cov, x, dist, fittype) {
   if(any(scale <= 0)) return(NA)
 
   # return negative log-likelihood
-  if (dist %in% c("norm", "lnorm")) {
+  if (dist %in% c("norm", "norm_logt")) {
     return(-sum(dnorm(x, mean = loc, sd = scale, log = T)))
   } else if (dist == "gev") {
     shape = pars["shape"]
@@ -75,11 +75,11 @@ fit_ns <- function(dist, type = "fixeddisp", data, varnm, covnm = NA, lower = F,
   # should also add something to handle case with no covariates
 
   # log-transform data for lognormal fitting
-  if (dist %in% c("lnorm")) x <- log(x)
+  if (dist %in% c("norm_logt")) x <- log(x)
 
   # currently only works for distributions fully specified by mean & sd: only tested for normal, lognormal
-  if(! dist %in% c("norm", "gev", "gumbel", "lnorm")) {
-    print("Not yet implemented: use norm or gev")
+  if(! dist %in% c("norm", "gev", "gumbel", "norm_logt")) {
+    print("Not yet implemented: use norm, norm_logt, gev or gumbel")
     return()
   }
 
@@ -171,7 +171,7 @@ refit <- function(mdl, new_data) {
 #'
 aic <- function(mdl) {
   nll <- 2 * length(mdl$par) + 2 * mdl$value
-  if(mdl$dist %in% c("lnorm")) nll <- nll + 2*sum(log(mdl$x))
+  if(mdl$dist %in% c("norm_logt")) nll <- nll + 2*sum(log(mdl$x))
   return(nll)
 }
 
