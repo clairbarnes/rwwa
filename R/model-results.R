@@ -49,7 +49,7 @@ mdl_ests <- function(mdl, cov_f, cov_cf, ev, rp = NA) {
       setNames(c(pr, di_abs, di_rel), paste0(c("PR", "dI_abs", "dI_rel"), "_",rnm))
     }))
   }
-  if(mdl$dist %in% c("lnorm")) {
+  if(mdl$dist %in% c("norm_logt")) {
     ev <- exp(ev)
     # could also reverse transformation on model parameters here, if preferred
   }
