@@ -230,7 +230,7 @@ cmodel_results <- function(mdl, rp = 10, cov_f, cov_hist, cov_fut,
   if(!missing(cov_fut)) res <- c(res, "aic_proj" = aic(mdl_proj))
 
   # reshape & relabel results
-  res <- t(data.frame(c(res, "aic" = mdl_attr["aic"]))
+  res <- t(data.frame(res))
   rownames(res) <- paste0(mdl$varnm, " ~ ", paste(mdl$covnm, collapse = " + "), " (rp", rp,")")
   return(res)
 }
