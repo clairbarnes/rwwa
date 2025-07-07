@@ -112,14 +112,17 @@ boot_ci <- function(mdl, cov_f, cov_cf, ev, rp = NA, seed = 42, nsamp = 500, ci 
 
   # get bootstrap sample
   set.seed(seed)
-  boot_res <- sapply(1:nsamp, function(i) {
+  boot_res <- list()
+  i <- 1
+  while(length(boot_res) < nsamp) {
     boot_df <- mdl$data[sample(1:nrow(mdl$data), replace = T),]
     tryCatch({
       boot_mdl <- refit(mdl, new_data = boot_df)
-      mdl_ests(boot_mdl, cov_f, cov_cf, ev = ev, rp = rp)
+      boot_res[[i]] <- mdl_ests(boot_mdl, cov_f, cov_cf, ev = ev, rp = rp)
     },
     error = function(cond) {return(rep(NA, length(obs_res)))})
-  })
+  }
+  boot_res <- do.call("cbind",boot_res)
   if(return_sample) {
     return(boot_res)
   } else {
