@@ -113,14 +113,16 @@ boot_ci <- function(mdl, cov_f, cov_cf, ev, rp = NA, seed = 42, nsamp = 500, ci 
   # get bootstrap sample
   set.seed(seed)
   boot_res <- list()
-  i <- 1
+  i <- 1 # keep track of number of successes
+  f <- 0 # keep track of number of failures
   while(length(boot_res) < nsamp) {
     boot_df <- mdl$data[sample(1:nrow(mdl$data), replace = T),]
     tryCatch({
       boot_mdl <- refit(mdl, new_data = boot_df)
       boot_res[[i]] <- mdl_ests(boot_mdl, cov_f, cov_cf, ev = ev, rp = rp)
+      i <- i+1
     },
-    error = function(cond) {return(rep(NA, length(obs_res)))})
+    error = function(cond) {f <- f+1; return(NULL)})
   }
   boot_res <- do.call("cbind",boot_res)
   if(return_sample) {
