@@ -36,7 +36,7 @@ boot_ci(
 \item{return_sample}{Boolean: return confidence interval (F) or full bootstrap sample (T)? Default is to return the interval (F).}
 }
 \value{
-Data.frame containing estimates of all model parameters and quantities of interest, along with limits of central confidence interval; or matrix of bootstrapped values of each quantity (can be useful if 95% interval is unstable)
+Data.frame containing estimates of all model parameters and quantities of interest, along with limits of central confidence interval; or matrix of bootstrapped values of each quantity (can be useful if 95% interval is unstable). The last row of the summary dataframe contains the number of observations, the number of bootstrap replicates, and the number of failed bootstrap samples.
 }
 \description{
 Bootstrapped confidence intervals of parameter estimates for a fitted model

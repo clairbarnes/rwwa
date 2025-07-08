@@ -71,7 +71,7 @@ mdl_ests <- function(mdl, cov_f, cov_cf, ev, rp = NA) {
 #' @param ci Scalar from 0 to 1 defining width of confidence interval. Default is 0.95
 #' @param return_sample Boolean: return confidence interval (F) or full bootstrap sample (T)? Default is to return the interval (F).
 #'
-#' @return Data.frame containing estimates of all model parameters and quantities of interest, along with limits of central confidence interval; or matrix of bootstrapped values of each quantity (can be useful if 95% interval is unstable)
+#' @return Data.frame containing estimates of all model parameters and quantities of interest, along with limits of central confidence interval; or matrix of bootstrapped values of each quantity (can be useful if 95% interval is unstable). The last row of the summary dataframe contains the number of observations, the number of bootstrap replicates, and the number of failed bootstrap samples.
 #'
 #' @export
 #'
@@ -122,13 +122,18 @@ boot_ci <- function(mdl, cov_f, cov_cf, ev, rp = NA, seed = 42, nsamp = 500, ci 
       boot_res[[i]] <- mdl_ests(boot_mdl, cov_f, cov_cf, ev = ev, rp = rp)
       i <- i+1
     },
-    error = function(cond) {f <- f+1; return(NULL)})
+    error = function(cond) {
+      f <- f+1
+      return(NULL)
+    })
   }
   boot_res <- do.call("cbind",boot_res)
   if(return_sample) {
     return(boot_res)
   } else {
-    boot_qq <- t(rbind("est" = obs_res, apply(boot_res, 1, quantile, c(alpha/2, 1-(alpha/2)), na.rm = T)))
+    boot_qq <- t(rbind("est" = obs_res,
+                       apply(boot_res, 1, quantile, c(alpha/2, 1-(alpha/2)), na.rm = T),
+                       "n" = c(length(mdl$x), nsamp, f))) # append number of obs/samples/failures
     return(boot_qq)
   }
 }
