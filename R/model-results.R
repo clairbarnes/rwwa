@@ -131,9 +131,9 @@ boot_ci <- function(mdl, cov_f, cov_cf, ev, rp = NA, seed = 42, nsamp = 500, ci 
   if(return_sample) {
     return(boot_res)
   } else {
-    boot_qq <- t(rbind("est" = obs_res,
-                       apply(boot_res, 1, quantile, c(alpha/2, 1-(alpha/2)), na.rm = T),
-                       "n" = c(length(mdl$x), nsamp, f))) # append number of obs/samples/failures
+    boot_qq <- rbind(t(rbind("est" = obs_res,
+                             apply(boot_res, 1, quantile, c(alpha/2, 1-(alpha/2)), na.rm = T))),
+                     "n" = c(length(mdl$x), nsamp, f)) # append number of obs/samples/failures
     return(boot_qq)
   }
 }
