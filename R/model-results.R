@@ -201,6 +201,7 @@ cmodel_results <- function(mdl, rp = 10, cov_f, cov_hist, cov_fut,
   # get bootstrapped intervals, select only the elements of interest
   ci_eval <- boot_ci(mdl_eval, cov_f = cov_f, cov_cf = cov_hist, ev = event_rl, rp = rp, nsamp = nsamp)[key_par,,drop = F]
   ci_attr <- boot_ci(mdl_attr, cov_f = cov_f, cov_cf = cov_hist, ev = event_rl, rp = rp, nsamp = nsamp)
+  n_attr <- setNames(ci_attr["n",], paste0("attr_", c("nobs", "nsamp", "nfailed")))
   ci_attr <- ci_attr[grepl("PR|dI_abs|dI_rel", rownames(ci_attr)),]
 
   # flatten & rename
@@ -209,6 +210,7 @@ cmodel_results <- function(mdl, rp = 10, cov_f, cov_hist, cov_fut,
 
   # compile results so far
   res <- c(ci_eval, "rp_value" = event_rl, ci_attr)
+  c_aic <- c("aic_eval" = aic(mdl_eval), "aic_attr" = aic(mdl_attr))
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # bootstrap model results (if future covariates given)
@@ -222,22 +224,23 @@ cmodel_results <- function(mdl, rp = 10, cov_f, cov_hist, cov_fut,
 
     # bootstrap results
     ci_proj <- boot_ci(mdl_proj, cov_f = cov_f, cov_cf = cov_fut, ev = event_rl, rp = rp, nsamp = nsamp)
+    n_proj <- setNames(ci_proj["n",], paste0("proj_", c("nobs", "nsamp", "nfailed")))
     ci_proj <- ci_proj[grepl("PR|dI_abs|dI_rel", rownames(ci_proj)),]
 
     # invert future projections
     ci_proj[grepl("PR", rownames(ci_proj)),] <- 1/ci_proj[grepl("PR", rownames(ci_proj)),c(1,3,2)]
     ci_proj[grepl("dI_", rownames(ci_proj)),] <- -ci_proj[grepl("dI_", rownames(ci_proj)), c(1,3,2)]
-
     ci_proj <- unlist(lapply(rownames(ci_proj), function(cnm) setNames(ci_proj[cnm,], paste("proj", gsub("_", "-", cnm), c("est", "lower", "upper"), sep = "_"))))
 
     res <- c(res, ci_proj)
+    n_attr <- c(n_attr, n_proj)
+    c_aic <- c(c_aic,  "aic_proj" = aic(mdl_proj))
   }
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   # add AIC for each model
-  res <- c(res, "aic_eval" = aic(mdl_eval), "aic_attr" = aic(mdl_attr))
-  if(!missing(cov_fut)) res <- c(res, "aic_proj" = aic(mdl_proj))
+  res <- c(res, c_aic, n_attr)
 
   # reshape & relabel results
   res <- t(data.frame(res))
