@@ -27,9 +27,9 @@ ns_loglik <- function(pars, cov, x, dist, fittype) {
   if(any(scale <= 0)) return(NA)
 
   # return negative log-likelihood
-  if (dist %in% c("norm",)) {
+  if (dist == "norm") {
     return(-sum(dnorm(x, mean = loc, sd = scale, log = T)))
-  } else if (dist %in% c("norm_logt")) {
+  } else if (dist == "norm_logt") {
     return(sum(log(x))-sum(dnorm(x, mean = loc, sd = scale, log = T)))
   } else if (dist == "gev") {
     shape = pars["shape"]
