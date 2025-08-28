@@ -231,7 +231,7 @@ plot_returnlevels <- function(mdl, cov_f, cov_cf, ev, seed = 42, nsamp = 500, mo
                               xlim = c(1,10000), ylim = NA, pch = 20, xlab = "Return period (years)", ylab = NA, main = "",
                               legend_pos = "topright", legend_labels = c("Present climate", "Counterfactual climate")) {
 
-  x <- mdl$x
+  if(mdl$dist == "norm_logt") { x <- exp(mdl$x) } else { x <- mdl$x } # only used to set ylims
   if(missing(ev)) { ev <- mdl$ev }
 
   rp_x <- unique(c(seq(1.1,2,0.1), seq(2,100,1), seq(100,1000,10), seq(100,1000,100), seq(1000,10000,1000)))     # return periods at which to calculate values for curves
@@ -265,8 +265,6 @@ plot_returnlevels <- function(mdl, cov_f, cov_cf, ev, seed = 42, nsamp = 500, mo
     rl_curve_cf <- exp(rl_curve_cf)
     rl_obs_pres <- exp(rl_obs_pres)
     rl_obs_cf <- exp(rl_obs_cf)
-    rp_event_pres <- exp(rp_event_pres)
-    rp_event_cf <- exp(rp_event_cf)
     ev <- exp(ev)
   }
 
