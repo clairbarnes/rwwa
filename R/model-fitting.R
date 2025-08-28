@@ -171,7 +171,7 @@ refit <- function(mdl, new_data) {
 #'
 aic <- function(mdl) {
   nll <- 2 * length(mdl$par) + 2 * mdl$value
-  if(mdl$dist %in% c("norm_logt")) nll <- nll + 2*sum(log(mdl$x))
+  if(mdl$dist %in% c("norm_logt")) nll <- nll + 2*sum(mdl$x)
   return(nll)
 }
 
