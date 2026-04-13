@@ -163,7 +163,6 @@ cmodel_results <- function(mdl, rp = 10, cov_f, cov_hist, cov_fut,
                            y_start = 1979, y_now = as.integer(substr(Sys.Date(),1,4)), y_fut = 2050,
                            nsamp = 5, seed = 42, ci = 0.95, return_sample = F) {
 
-  alpha <- 1-ci
   set.seed(seed)
 
   # fill in missing parameters
@@ -236,17 +235,6 @@ cmodel_results <- function(mdl, rp = 10, cov_f, cov_hist, cov_fut,
     n_attr <- c(n_attr, n_proj)
     c_aic <- c(c_aic,  "aic_proj" = aic(mdl_proj))
   }
-
-  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-  # add AIC for each model
-  res <- c(res, c_aic, n_attr)
-
-  # reshape & relabel results
-  res <- t(data.frame(res))
-  rownames(res) <- paste0(mdl$varnm, " ~ ", paste(mdl$covnm, collapse = " + "), " (rp", rp,")")
-  return(res)
-}
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
