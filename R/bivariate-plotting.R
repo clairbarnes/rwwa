@@ -78,7 +78,7 @@ plot_fitted_copula <- function(joint_model, levels = c(0.5,1,1.5), add_sample = 
 #'
 #' @export
 #'
-plot_joint_returnperiods <- function(joint_model, fixed_cov, add = F, rp = c(5,10,20,50), xlim, ylim, ...) {
+plot_joint_contour <- function(joint_model, fixed_cov, add = F, rp = c(5,10,20,50), xlim, ylim, ...) {
 
   if(nrow(fixed_cov) > 1) {
     cat("More than one set of covariates provided - only showing first set, plot others separately")
