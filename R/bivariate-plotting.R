@@ -34,6 +34,38 @@ copula_mesh <- function(joint_model, fixed_cov, xrange, yrange, n = 32) {
 
 
 ################################################################################################################################
+#' Plot a fitted bivariate copula
+#'
+#' @description
+#' Plot the fitted copula against the observed sample to check the goodness of fit. Formal goodness of fit testing is not yet implemented.
+#'
+#' @param joint_model A list containing two nonstationary marginal distriutions and a joint copula, as returned by 'fit_copula'.
+#' @param levels Vector of levels at which contours of the empirical and fitted contours should be plotted.
+#' @param add_sample Boolean: add a random sample from the copula? Default is F.
+#' @param ... Other graphical parameters to be passed to the plotting function.
+#'
+#' @export
+#'
+plot_fitted_copula <- function(joint_model, levels = c(0.5,1,1.5), add_sample = F, ...) {
+
+  # transform marginals to U
+  u_x <- map_to_u(joint_model$mdl_x)
+  u_y <- map_to_u(joint_model$mdl_y)
+
+  plot(u_x, u_y, col = "black", pch = 20, xlab = paste0("u_",joint_model$mdl_x$varnm), ylab = paste0("u_",joint_model$mdl_y$varnm), xaxs = "i", yaxs = "i", ...)
+
+  if(add_sample) {
+    # generate sample from the copula
+    samp <- rCopula(length(u_x), joint_model$copula)
+    points(samp, col = "cornflowerblue", pch = 1)
+  }
+  
+  contour(kde2d(u_x, u_y), col = "black", add = T, levels = levels)
+  contour(joint_model$copula, dCopula, add = T, col = "cornflowerblue", lty = 2, levels = levels)
+}
+
+
+################################################################################################################################
 #' Plot contours of equal return periods for a bivariate model.
 #'
 #' @param joint_model A list containing two nonstationary marginal distributions and a joint copula, as returned by 'fit_copula'.
@@ -46,7 +78,7 @@ copula_mesh <- function(joint_model, fixed_cov, xrange, yrange, n = 32) {
 #'
 #' @export
 #'
-plot_joint_contour <- function(joint_model, fixed_cov, add = F, rp = c(5,10,20,50), xlim, ylim, ...) {
+plot_joint_returnperiods <- function(joint_model, fixed_cov, add = F, rp = c(5,10,20,50), xlim, ylim, ...) {
 
   if(nrow(fixed_cov) > 1) {
     cat("More than one set of covariates provided - only showing first set, plot others separately")
@@ -59,6 +91,7 @@ plot_joint_contour <- function(joint_model, fixed_cov, add = F, rp = c(5,10,20,5
   cmesh <- copula_mesh(joint_model, fixed_cov = fixed_cov, xrange = xlim, yrange = ylim)
   contour(cmesh, levels = 1/rp, labels = rp, xaxs = "i", yaxs = "i", add = add, ...)
 }
+
 
 
 ################################################################################################################################
