@@ -8,6 +8,14 @@ Description: Functions to fit nonstationary models with linear or exponential de
 License: CC BY-NC 4.0
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.1
-Depends:
-  extRemes, plyr, methods, copula, MASS
+RoxygenNote: 7.3.3
+Imports: 
+    extRemes,
+    MASS,
+    plyr,
+    methods,
+    copula,
+    grDevices,
+    graphics,
+    stats,
+    utils
