@@ -11,9 +11,10 @@
 #'
 #' @export
 #'
-prep_window <- function(rc = c(1,1), w = 4, h = 4, res = 200, pch = 20, ...) {
+prep_window <- function(rc = c(1,1), w = 4, h = 4, res = 200, pch = 20, heights = NULL, ...) {
   options(repr.plot.width = rc[2]*w, repr.plot.height = rc[1]*h, repr.plot.res = res)
-  par(mfrow = rc, pch = pch, ...)
+  layout(matrix(seq_len(prod(rc)), nrow = rc[1], byrow = TRUE), heights = heights)
+  par(pch = pch, ...)
 }
 
 
